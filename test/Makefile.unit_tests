@@ -1,0 +1,29 @@
+#
+# Simple Makefile for running core GTL unit tests standalone:  
+# 
+# make -f Makefile.unit_tests 
+#
+#
+# History:
+# vamsi.krishnak@gmail.com	: 05/25/2015 : created
+#
+
+BOOST_INCLUDE_ROOT = ../include/
+
+POLY_FORM_UNIT_TEST_SRCS = gtl_boost_polygon_formation_unit_test.cpp
+POLY_FORM_UNIT_TEST_TARGET = gtl-unit-tests-poly-form
+
+CC = g++
+FLAGS = -O3
+ifeq (${DEBUG}, 1)
+	FLAGS = -g
+endif
+
+run_unit_tests: clean polygon_formation_unit_tests
+	./${POLY_FORM_UNIT_TEST_TARGET}
+
+polygon_formation_unit_tests: ${POLY_FORM_UNIT_TEST_SRCS} 
+	${CC} -I${BOOST_INCLUDE_ROOT} ${POLY_FORM_UNIT_TEST_SRCS} -o ${POLY_FORM_UNIT_TEST_TARGET} ${FLAGS}
+
+clean:
+	rm -rf *.o ${POLY_FORM_UNIT_TEST_TARGET}
