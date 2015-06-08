@@ -9,6 +9,7 @@
 #define BOOST_POLYGON_NO_DEPS
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/polygon_90_set_data_iterator.hpp>
+#include "gtl_boost_polygon_90_unit_test_utils.h"
 
 namespace gtl = boost::polygon;
 using namespace boost::polygon::operators;
@@ -53,17 +54,10 @@ void assert_s(bool c, std::string msg) {
  * +--------------------+
  *
  * Test Plan: 
- * a. call 'get(out, param)' , param >=4 
+ * a. call 'get(out, param)' , param >= 4 
  * b. check if each polygon in the container is <= param
  * c. check the area of all the pieces sum up to original piece
  */
-typedef int intDC;
-typedef boost::polygon::polygon_90_with_holes_data<intDC> GTLPolygon;
-typedef boost::polygon::polygon_90_set_data<intDC> GTLPolygonSet;
-typedef boost::polygon::polygon_90_concept GTLPolygonConcept;
-typedef boost::polygon::point_data<intDC> GTLPoint;
-inline void PrintPolygon(const GTLPolygon&);
-inline GTLPolygon CreateGTLPolygon(const int*, size_t); 
 
 int test_new_polygon_formation(int argc, char** argv){
    //                                               //
@@ -77,8 +71,8 @@ int test_new_polygon_formation(int argc, char** argv){
    GTLPolygon poly, poly1;
    GTLPolygonSet polySet;
    
-   poly = CreateGTLPolygon(coordinates, count);
-   poly1 = CreateGTLPolygon(coordinates1, count1);
+   CreateGTLPolygon(coordinates, count, poly);
+   CreateGTLPolygon(coordinates1, count1, poly1);
 
    polySet.insert(poly);
    polySet.insert(poly1);
@@ -116,8 +110,8 @@ int test_new_polygon_formation(int argc, char** argv){
    count = sizeof(shell_coords)/(2*sizeof(intDC));
    count1 = sizeof(hole_coords)/(2*sizeof(intDC));
 
-   slice_polygon = CreateGTLPolygon(shell_coords, count);
-   slice_hole = CreateGTLPolygon(hole_coords, count1);
+   CreateGTLPolygon(shell_coords, count, slice_polygon);
+   CreateGTLPolygon(hole_coords, count1, slice_hole);
 
    result.clear();
    polySet.clear();
@@ -203,7 +197,7 @@ int test_new_polygon_formation_marginal_threshold(int argc, char**){
    intDC coords[] = {0,0, 15,0, 15,10, 10,10, 10,15, 5,15, 5,10, 0,10};
    size_t count = sizeof(coords)/(2*sizeof(intDC));
 
-   polygon = CreateGTLPolygon(coords, count);
+   CreateGTLPolygon(coords, count, polygon);
    pset.insert(polygon);
 
    for(size_t i=0; i<1; i++){
@@ -229,33 +223,6 @@ int test_new_polygon_formation_marginal_threshold(int argc, char**){
    std::cout << "Test Passed" << std::endl;
    return 0;
 }
-
-inline void PrintPolygon(const GTLPolygon& p){
-   //get an iterator of the point_data<int>
-   boost::polygon::point_data<int> pt;
-   boost::polygon::polygon_90_data<int>::iterator_type itr;
-
-   size_t vertex_id = 0;
-   for(itr = p.begin(); itr != p.end(); ++itr){
-      pt = *itr;
-      std::cout << "Vertex-" << ++vertex_id << "(" << pt.x() <<
-         "," << pt.y() << ")" << std::endl;
-   }
-}
-
-// size: is the number of vertices //
-inline GTLPolygon CreateGTLPolygon(const int *coords, size_t size){
-   GTLPolygon r;
-   std::vector<GTLPoint> pts;
-
-   for(size_t i=0; i<size; i++){
-      pts.push_back( GTLPoint(coords[2*i], coords[2*i+1]) );
-   }
-   boost::polygon::set_points(r, pts.begin(), pts.end());
-   return r;
-}
-
-/************************************************************/
 
 /*******************Test Iterator Support*******************/
 
@@ -291,14 +258,24 @@ int test_orthogonal_half_edge(void) {
     return 0;
 }
 
-int main() {
+int test_orthogonal_half_edge_iterator();
+/************************************************************/
+
+int main(int argc, char** argv) {
   //this test fails and I'd like to get it to pass
   //if(!test_colinear_duplicate_points()) return 1;
   //
 
-
+  /** Iterative polygon formation tests. */
   if (test_orthogonal_half_edge()) {
+     std::cerr << "[test_orthogonal_half_edge]: failed" << std::endl;
       return 1;
+  }
+
+  if (test_orthogonal_half_edge_iterator()) {
+    std::cerr << "[test_orthogonal_half_edge_iterator]: failed" 
+      << std::endl;
+    return 1;
   }
 
   /*New polygon_formation tests*/ 
