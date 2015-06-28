@@ -3,7 +3,7 @@
 
 #include <iostream>
 #define BOOST_POLYGON_NO_DEPS
-#include <boost/polygon/polygon.hpp>
+#include <boost/polygon/gtl.hpp>
 
 typedef int intDC;
 typedef boost::polygon::polygon_90_with_holes_data<intDC> GTLPolygon;
@@ -35,5 +35,21 @@ inline void CreateGTLPolygon(const int *coords, size_t size, Polygon& r){
    }
    boost::polygon::set_points(r, pts.begin(), pts.end());
 }
+/**
+ * Use XOR to check if both the Manhattan polygons p1 and p2 are
+ * equivalent.
+ */
+template<typename Polygon>
+inline bool CheckManhattanPolygonEquality(Polygon p1, Polygon p2) {
+  typedef typename boost::polygon::polygon_traits<Polygon>::coordinate_type
+    Unit;
+  boost::polygon::polygon_90_set_data<Unit> pset1;
+  boost::polygon::polygon_90_set_data<Unit> pset2;
 
+  pset1.insert(p1);
+  pset2.insert(p2);
+  pset1 ^= pset2;
+
+  return pset1.empty();
+}
 #endif

@@ -258,7 +258,8 @@ int test_orthogonal_half_edge(void) {
     return 0;
 }
 
-int test_orthogonal_half_edge_iterator();
+extern int test_orthogonal_half_edge_iterator();
+extern int test_active_tail_formation();
 /************************************************************/
 
 int main(int argc, char** argv) {
@@ -288,6 +289,11 @@ int main(int argc, char** argv) {
      std::cerr << "[test_new_polygon_formation_marginal_threshold] failed" 
          << std::endl;
      return 1;
+  }
+
+  if (test_active_tail_formation()) {
+    std::cerr << "[test_active_tail_formation] failed" << std::endl;
+    return 1;
   }
 
   std::cout << "ALL TESTS COMPLETE\n";
